@@ -8,8 +8,9 @@ def multiplier(a:int, b:int) -> int:
 	return res
 
 if __name__ == "__main__":
-	for i in range(2 ** 8):
-		for ii in range(1024):
+	bin_digits = 8
+	for i in range(2 ** bin_digits):
+		for ii in range(2 ** bin_digits):
 			true = i * ii
 			test = multiplier(i, ii)
 			if true != test:
