@@ -1,8 +1,8 @@
 def adder(a:int, b:int) -> int:
 	while b:
-		xor = a ^ b
+		_xor = a ^ b
 		_and = (a & b) << 1
-		a = xor
+		a = _xor
 		b = _and
 	return a
 
