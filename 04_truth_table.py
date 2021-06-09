@@ -12,45 +12,62 @@ def get_vars_in_formulas(formula: str, debug=False) -> list:
 		print(f"Variables present in equation {var_list}")
 	return var_list
 
-def combinatories(size) -> list:
-	# NOT WORKING YET !!!
-
+def combinatories(size, debug=False) -> list:
 	# Could be done with a bianry number going up to (2**size - 1)
 	# Could be done in recursivity with some magic
 	# Could be done with itertools
+	nx2 = (1 << size)
+	for comb in range(nx2):
+		comb_list = []
+		for ii in range(size):
+			mask = (comb & (1 << ii))
+			True_False = (comb & mask) != 0
+			comb_list.append(1 if True_False else 0)
+		if debug:
+			print(f"Comb is: {comb_list}")
+		yield comb_list
 
-	if len(vars) < 1:
-		return vars_vals
-	print(f"Vars = {vars}")
-	print(f"vars_vals = {vars_vals}")
-	vars_comb = []
+def translate_formula(formula: str, var_list: list, comb: list, debug=False)-> str:
+	new_formula = formula[:]
+	for v, c in zip(var_list, comb):
+		new_formula = new_formula.replace(v, str(c))
+	if debug:
+		print(f"Translated formula: {new_formula}")
+	return new_formula
 
-	if vars_vals != []:
-		vars_vals_true = copy.deepcopy(vars_vals)
-		vars_vals_fals = copy.deepcopy(vars_vals)
-	else:
-		vars_vals_true = []
-		vars_vals_fals = []
-
-	vars_vals_true.append('1')
-	print(f"vars_vals_true = {vars_vals_true}")
-	ret = combinatories(vars[1:], vars_vals_true)
-	vars_comb.expend(ret)
-
-	vars_vals_fals.append('0')
-	ret = combinatories(vars[1:], vars_vals_false)
-	vars_comb.expend(ret)
-
-	return vars_comb
+def nice_print(formula: str, var_list: list, truth_list: list)-> None:
+	# Intro line
+	msg = f"Formula: {formula}\n"
+	# Header
+	for i in range(len(var_list)):
+		msg += "| " + var_list[i] + " "
+	msg += "| " + "=" + " |\n"
+	# Table
+	for truth in truth_list:
+		for t in truth:
+			msg += "| " + str(t) + " "
+		msg += "|\n"
+	print(msg)
 
 def truth_table(formula: str, debug=False) -> None:
 	if debug:
 		print(f"Equation: {formula}")
 	var_list = get_vars_in_formulas(formula, debug=False)
-	combs = combinatories(var_list)
+	combs = combinatories(var_list, debug=debug)
+	truth_list = []
+	for comb in combinatories(len(var_list)):
+		if debug:
+			print(f"Combinatory: {comb}")
+
+		new_formula = translate_formula(formula, var_list, comb, debug=debug)
+		result =eval_formula(new_formula)
+		comb.append(1 if result else 0)
+		truth_list.append(comb)
+
 	if debug:
-		print(f"Combinatories: {combs}")
+		print(f"Truth table: {truth_list}")
+	nice_print(formula, var_list, truth_list)
 
 if __name__ == "__main__":
 	test = "AB&C|"
-	truth_table(test, debug=True)
+	truth_table(test, debug=False)
